@@ -1,0 +1,4 @@
+data/*.csv filter=lfs diff=lfs merge=lfs -text
+data/nhs_appointments_Aug_2023_2024_2025_with_imd.csv filter=lfs diff=lfs merge=lfs -text
+data/nhs_appointments_Mar_2023_to_Aug_2025_with_imd.csv filter=lfs diff=lfs merge=lfs -text
+“data/nhs_appointments_Mar_2023_to_Aug_2025_with_imd.csv” filter=lfs diff=lfs merge=lfs -text

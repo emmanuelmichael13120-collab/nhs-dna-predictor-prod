@@ -1,0 +1,7 @@
+streamlit
+pandas
+xgboost>=3.0
+shap
+plotly
+joblib
+matplotlib
