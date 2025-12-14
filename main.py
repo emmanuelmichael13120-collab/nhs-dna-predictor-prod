@@ -452,7 +452,7 @@ else:
     st.info("🔍 This dashboard is **live** — every chart, KPI, and recommendation is calculated in real time from the full national dataset.")
     
     st.markdown("---")
-    st.markdown("**Built with ❤️ for the NHS** • [GitHub Repository](https://github.com/yourusername/nhs-dna-predictor) • Open to collaboration")
+    st.markdown("**Built with ❤️ for the NHS** • [GitHub Repository](https://github.com/emmanuelmichael13120-collab/nhs-dna-predictor-prod) • Open to collaboration")
 # else:
 #     st.title("About & Methods")
 #     st.markdown("""
