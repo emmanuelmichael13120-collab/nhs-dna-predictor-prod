@@ -23,12 +23,32 @@ st.set_page_config(
 
 # -------------------------- Load Model & Explainer --------------------------
 @st.cache_resource(show_spinner="Loading national DNA prediction model...")
+# def load_artifacts():
+#     model = xgb.XGBClassifier()
+#     model.load_model("model/xgb_dna_model.json")
+#     explainer = joblib.load("model/shap_explainer.pkl")
+#     with open("assets/england_icb.geojson") as f:
+#         geojson = json.load(f)
+#     return model, explainer, geojson
+
+# import xgboost as xgb
+# import joblib
+
 def load_artifacts():
-    model = xgb.XGBClassifier()
-    model.load_model("model/xgb_dna_model.json")
+    # Load the core booster directly (highly compatible)
+    booster = xgb.Booster()
+    booster.load_model("model/xgb_dna_model.json")
+    
+    # Wrap it into XGBClassifier for sklearn-like API (predict_proba works fine)
+    model = xgb.XGBClassifier()  # Params optional here
+    model._Booster = booster     # Direct assignment bypasses checks
+    
     explainer = joblib.load("model/shap_explainer.pkl")
-    with open("assets/england_icb.geojson") as f:
+    # geojson load...
+    # === FIXED: Load GeoJSON here ===
+    with open("assets/england_icb.geojson", "r") as f:
         geojson = json.load(f)
+    
     return model, explainer, geojson
 
 model, explainer, geojson = load_artifacts()
@@ -67,7 +87,7 @@ if page == "National Overview":
     # ============ CALCULATE EVERYTHING FROM YOUR REAL DATA ============
     @st.cache_data(show_spinner="Crunching 9.75 million rows – this takes ~15 seconds first time only...")
     def calculate_national_stats():
-        df = pd.read_csv("data/nhs_appointments_Mar_2023_to_Aug_2025_with_imd.csv")
+        df = pd.read_csv("data/nhs_appointments_Aug_2024_2025_with_imd.csv")
 
         # === FIX: Create DNA column from the real APPT_STATUS column ===
         df['DNA'] = (df['APPT_STATUS'].str.strip() == 'DNA').astype(int)
@@ -158,7 +178,7 @@ elif page == "Explore Your ICB":
     # Load the full data once (cached)
     @st.cache_data
     def load_full_data():
-        df = pd.read_csv("data/nhs_appointments_Mar_2023_to_Aug_2025_with_imd.csv")
+        df = pd.read_csv("data/nhs_appointments_Aug_2024_2025_with_imd.csv")
         df['Appointment_Date'] = pd.to_datetime(df['Appointment_Date'], dayfirst=True, errors='coerce')
         df['DNA'] = (df['APPT_STATUS'].str.strip() == 'DNA').astype(int)
         return df
@@ -332,7 +352,7 @@ elif page == "Recommendations":
 
     @st.cache_data(show_spinner="Analysing 9.75 million appointments for maximum impact...")
     def get_recommendations():
-        df = pd.read_csv("data/nhs_appointments_Mar_2023_to_Aug_2025_with_imd.csv")
+        df = pd.read_csv("data/nhs_appointments_Aug_2024_2025_with_imd.csv")
         df['DNA'] = (df['APPT_STATUS'].str.strip() == 'DNA').astype(int)
         df['Appointment_Date'] = pd.to_datetime(df['Appointment_Date'], dayfirst=True, errors='coerce')
         df['Weekday'] = df['Appointment_Date'].dt.day_name()
@@ -452,7 +472,7 @@ else:
     st.info("🔍 This dashboard is **live** — every chart, KPI, and recommendation is calculated in real time from the full national dataset.")
     
     st.markdown("---")
-    st.markdown("**Built with ❤️ for the NHS** • [GitHub Repository](https://github.com/emmanuelmichael13120-collab/nhs-dna-predictor-prod) • Open to collaboration")
+    st.markdown("**Built with ❤️ for the NHS** • [GitHub Repository](https://github.com/yourusername/nhs-dna-predictor) • Open to collaboration")
 # else:
 #     st.title("About & Methods")
 #     st.markdown("""
